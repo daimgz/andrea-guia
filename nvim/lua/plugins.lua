@@ -6,18 +6,18 @@ return {
   { 'nvim-tree/nvim-web-devicons', lazy = true, opts = { default = true } },
 
   -- Syntax / colors / treesitter
-  { 
+  {
     'norcalli/nvim-colorizer.lua',
-    config = function() require('colorizer').setup() end 
+    config = function() require('colorizer').setup() end
   },
-  { 
+  {
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     config = function()
       require('nvim-treesitter.configs').setup({
         highlight = { enable = true },
         indent = { enable = true },
-        refactor = { 
+        refactor = {
           highlight_definitions = { enable = true },
           highlight_current_scope = { enable = true },
         },
@@ -238,8 +238,8 @@ return {
     dependencies = 'nvim-tree/nvim-web-devicons',
     config = function()
       require('bufferline').setup({
-        options = { 
-            numbers = "none", 
+        options = {
+            numbers = "none",
             show_tab_indicators = false,
                     mode = "tabs"
                 }
@@ -533,7 +533,22 @@ return {
     'Aasim-A/scrollEOF.nvim',
     event = { 'CursorMoved', 'WinScrolled' },
     opts = {},
-  }
+  },
+  {
+    'nvim-treesitter/playground',
+    cmd = { "TSPlaygroundToggle", "TSNodeUnderCursor" },
+    dependencies = { 'nvim-treesitter/nvim-treesitter' },
+    config = function()
+      require'nvim-treesitter.configs'.setup {
+        playground = {
+          enable = true,
+          updatetime = 25,
+          persist_queries = false,
+        },
+      }
+    end,
+  },
+  { "Olivine-Labs/lustache" }
 --{
   --"folke/which-key.nvim",
   --config = function()
@@ -574,7 +589,7 @@ return {
 
   ---- Comments
   --cc = { "<plug>NERDCommenterToggle", "Toggle Comment" },
-  
+
   ---- Obsidian
   --o = {
     --name = "Obsidian",

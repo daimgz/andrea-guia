@@ -34,7 +34,7 @@
 // custom keycodes
 
 // NB! I use Norwegian keyboard layout on my machines, so the keymap probably
-//doesn't make much sense for US/ANSI users
+// doesn't make much sense for US/ANSI users
 
 #define F_FSLH S(KC_7) // forward slash
 #define F_BSLH KC_EQL // backward slash
@@ -151,4 +151,3 @@ const uint16_t PROGMEM encoder_map[][NUM_ENCODERS][NUM_DIRECTIONS] = {
     [WIN_FN]   = { ENCODER_CCW_CW(RGB_VAD, RGB_VAI)}
 };
 #endif // ENCODER_MAP_ENABLE
-

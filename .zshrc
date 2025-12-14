@@ -18,6 +18,8 @@ export PATH=$HOME/llvm15/bin:$PATH
 
 export GOPATH="$HOME/go"
 export PATH="$PATH:$HOME/Scripts:$GOPATH/bin"
+
+export PATH="/usr/lib/ccache/bin:$PATH"
 # Personal Zsh configuration file. It is strongly recommended to keep all
 # shell customization and configuration (including exported environment
 # variables such as PATH) in this file or in files sourced from it.
@@ -153,3 +155,6 @@ export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
+
+# opencode
+export PATH=/home/dai/.opencode/bin:$PATH

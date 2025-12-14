@@ -17,6 +17,12 @@ opt.termguicolors = true
 opt.laststatus = 2
 opt.showmode = false -- noshowmode
 vim.o.scrolloff = 3
+opt.ttimeoutlen = 0
+
+-- Swap file behavior
+opt.swapfile = false
+opt.updatecount = 0
+opt.writebackup = false
 
 -- Mouse and clipboard
 opt.mouse = 'a'

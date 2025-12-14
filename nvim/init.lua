@@ -12,6 +12,23 @@ end
 vim.opt.rtp:prepend(lazypath)
 vim.opt.termguicolors = true
 
+-- Lua para init.lua
+--local function generate_getters_setters()
+  --local lines = vim.fn.getline("'<", "'>")
+  --local result = {}
+  --for _, line in ipairs(lines) do
+    --local name = line:match("%s*[%w_]+%s+([%w_]+)")
+    --if name then
+      --table.insert(result, "function get" .. name:sub(1,1):upper()..name:sub(2) .. "() return self." .. name .. " end")
+      --table.insert(result, "function set" .. name:sub(1,1):upper()..name:sub(2) .. "(val) self." .. name .. " = val end")
+    --end
+  --end
+  --vim.fn.setline("'>", result)
+--end
+
+--vim.api.nvim_create_user_command('GenGettersSetters', generate_getters_setters, {range=true})
+
+
 -- 2) Load plugins (spec at nvim/lua/plugins.lua)
 pcall(function()
   require('lazy').setup(require('plugins'))
@@ -50,3 +67,6 @@ end)
 pcall(function()
   require('autocmds')
 end)
+
+require("gen_cpp_actions")
+require("kanban")

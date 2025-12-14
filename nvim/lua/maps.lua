@@ -58,13 +58,16 @@ imap('<C-D>', '<C-W>', 'Delete previous word', true)
 map({ 'n', 'v', 's', 'o' }, '<ESC>[8~', '<End>', { noremap = true, silent = true, desc = 'End key (terminal)' })
 map({ 'n', 'v', 's', 'o' }, '<ESC>[7~', '<Home>', { noremap = true, silent = true, desc = 'Home key (terminal)' })
 
-imap('<ESC>[8~', '<End>', 'End key (terminal)', true)
-imap('<ESC>[7~', '<Home>', 'Home key (terminal)', true)
+imap('<End>', '<End>', 'End key (terminal)', true)
+imap('<Home>', '<Home>', 'Home key (terminal)', true)
+--imap('<ESC>[8~', '<End>', 'End key (terminal)', true)
+--imap('<ESC>[7~', '<Home>', 'Home key (terminal)', true)
 
 -----------------------------------------------------------
 -- Save / Reload
 -----------------------------------------------------------
-map({ 'n', 'i' }, '<C-s>', '<Esc>:w<CR>', { desc = 'Save file', silent = true })
+imap('<C-s>', '<Esc>:w<CR><Right>i', 'Save file (insert)', true)
+nmap('<C-s>', ':w<CR>', 'Save file', true)
 
 -----------------------------------------------------------
 -- Code / CoC
@@ -84,14 +87,11 @@ vmap('<leader>ca', '<Plug>(coc-codeaction-selected)', 'Code Action on selection'
 nmap('<leader>cf', '<Plug>(coc-format)', 'Format buffer', true)
 nmap('<leader>ch', ':call CocActionAsync("doHover")<CR>', 'Show symbol docs', true)
 
--- Completion helpers (Coc)
-vim.keymap.set('i', '<End>', function()
-  return vim.fn['coc#pum#visible']() == 1 and vim.fn['coc#pum#confirm']() or '<End>'
-end, { expr = true, silent = true, desc = 'Confirm completion or move End' })
-
-vim.keymap.set('i', '<Home>', function()
-  return vim.fn['coc#pum#visible']() == 1 and vim.fn['coc#pum#cancel']() or '<Home>'
-end, { expr = true, silent = true, desc = 'Cancel completion or move Home' })
+-----------------------------------------------------------
+-- C++ Code Generation
+-----------------------------------------------------------
+vmap('<leader>cg', ':CppActions<CR>', 'C++ Generate actions', true)
+nmap('<leader>cg', ':CppActions<CR>', 'C++ Generate actions', true)
 
 -----------------------------------------------------------
 -- 💬 Comments
@@ -122,7 +122,7 @@ nmap('<leader>ft', function()
   Snacks.picker.todo_comments({
     keywords = {
       "TODO", "INFO", "WARNING",
-      "FIXME", "BUG", "ISSUE",
+      "FIXME", "BUG", "ISSUE", "FIX",
       "OPTIM", "PERFORMANCE", "OPTIMIZE",
       "TESTING", "PASSED", "FAILED",
     },
@@ -145,8 +145,27 @@ imap('<PageUp>', '<Esc>10<Up>i', '', true)
 imap('<PageDown>', '<Esc>10<Down>i', '', true)
 nmap('<S-Left>', '<C-O>', 'Jump backward', true)
 nmap('<S-Right>', '<C-I>', 'Jump forward', true)
-nmap('<C-Home>', 'gg', 'Go to file start', true)
-nmap('<C-End>', 'G', 'Go to file end', true)
+-- File navigation with g+Home/End (Ctrl+Home/End now used for tab movement)
+nmap('<leader><Home>', 'gg', 'Go to file start', true)
+nmap('<leader><End>', 'G', 'Go to file end', true)
+
+-- Tab movement
+nmap('<C-S-Home>', ':tabmove -1<CR>', 'Move tab left', true)
+imap('<C-S-Home>', '<Esc>:tabmove -1<CR>i', 'Move tab left (insert)', true)
+nmap('<C-S-End>', ':tabmove +1<CR>', 'Move tab right', true)
+imap('<C-S-End>', '<Esc>:tabmove +1<CR>i', 'Move tab right (insert)', true)
+
+-- Tab movement
+nmap('<C-Home>', ':tabmove -1<CR>', 'Move tab left', true)
+imap('<C-Home>', '<Esc>:tabmove -1<CR>i', 'Move tab left (insert)', true)
+nmap('<C-End>', ':tabmove +1<CR>', 'Move tab right', true)
+imap('<C-End>', '<Esc>:tabmove +1<CR>i', 'Move tab right (insert)', true)
+
+-- Tab movement
+nmap('<C-Home>', ':tabmove -1<CR>', 'Move tab left', true)
+imap('<C-Home>', '<Esc>:tabmove -1<CR>i', 'Move tab left (insert)', true)
+nmap('<C-End>', ':tabmove +1<CR>', 'Move tab right', true)
+imap('<C-End>', '<Esc>:tabmove +1<CR>i', 'Move tab right (insert)', true)
 
 -----------------------------------------------------------
 -- Delete helpers
@@ -175,7 +194,22 @@ nmap('<leader>gP', ':!git push<CR>', 'Git push', true)
 nmap('<leader>gb', function() Snacks.picker.git_branches() end, 'Git branches', true)
 nmap('<leader>gd', ':DiffviewOpen<CR>', 'Git diff open', true)
 nmap('<leader>gD', ':DiffviewClose<CR>', 'Git diff close', true)
+local function next_hunk_centered()
+  require('gitsigns').next_hunk()
+  vim.defer_fn(function()
+    vim.cmd('normal! zz')
+  end, 20)  -- 20ms de delay
+end
 
+local function prev_hunk_centered()
+  require('gitsigns').prev_hunk()
+  vim.defer_fn(function()
+    vim.cmd('normal! zz')
+  end, 20)
+end
+
+vim.keymap.set('n', '<leader>gn', next_hunk_centered, { desc = 'Git next hunk' })
+vim.keymap.set('n', '<leader>gN', prev_hunk_centered, { desc = 'Git previous hunk' })
 -----------------------------------------------------------
 -- Tabs
 -----------------------------------------------------------
@@ -188,11 +222,53 @@ nmap('<C-t>', ':tabnew<CR>', 'New tab', true)
 imap('<C-w>', '<Esc>:Tabclose<CR>i', 'Close tab', true)
 nmap('<C-w>', ':Tabclose<CR>', 'Close tab', true)
 
--- Tab navigation Alt+1..9
+ -- Tab navigation Alt+1..9
+--for i = 1, 9 do
+  --local key = string.format('<M-%d>', i)
+  --map('n', key, string.format(':tabn %d<CR>', i), vim.tbl_extend('force', silentArg, { desc = 'Go to tab ' .. i }))
+  --map('i', key, string.format('<Esc>:tabn %d<CR>i', i), vim.tbl_extend('force', silentArg, { desc = 'Go to tab ' .. i }))
+--end
+
+-- Tab navigation Ctrl+1..9
 for i = 1, 9 do
-  local key = string.format('<M-%d>', i)
-  map({ 'n', 'i', 'v' }, key, string.format(':tabn %d<CR>', i), vim.tbl_extend('force', silentArg, { desc = 'Go to tab ' .. i }))
+  local key = string.format('<C-%d>', i)
+  map('n', key, string.format(':tabn %d<CR>', i), vim.tbl_extend('force', silentArg, { desc = 'Go to tab ' .. i }))
+  map('i', key, string.format('<Esc>:tabn %d<CR>i', i), vim.tbl_extend('force', silentArg, { desc = 'Go to tab ' .. i }))
 end
+
+nmap('<C-a>', ':tabn 1<CR>', 'Go to tab 1', true)
+imap('<C-a>', '<Esc>:tabn 1<CR>i', 'Go to tab 1', true)
+
+nmap('<C-o>', ':tabn 2<CR>', 'Go to tab 2', true)
+imap('<C-o>', '<Esc>:tabn 2<CR>i', 'Go to tab 2', true)
+
+nmap('<C-e>', ':tabn 3<CR>', 'Go to tab 3', true)
+imap('<C-e>', '<Esc>:tabn 3<CR>i', 'Go to tab 3', true)
+
+nmap('<C-u>', ':tabn 4<CR>', 'Go to tab 4', true)
+imap('<C-u>', '<Esc>:tabn 4<CR>i', 'Go to tab 4', true)
+
+nmap('<C-i>', ':tabn 5<CR>', 'Go to tab 5', true)
+imap('<C-i>', '<Esc>:tabn 5<CR>i', 'Go to tab 5', true)
+
+-- Tab movement with Ctrl+Home/End
+nmap('<C-Home>', ':tabmove -1<CR>', 'Move tab left', true)
+imap('<C-Home>', '<Esc>:tabmove -1<CR>i', 'Move tab left (insert)', true)
+nmap('<C-End>', ':tabmove +1<CR>', 'Move tab right', true)
+imap('<C-End>', '<Esc>:tabmove +1<CR>i', 'Move tab right (insert)', true)
+
+-- Tab navigation with Ctrl+Left/Right
+nmap('<C-Left>', ':tabprevious<CR>', 'Go to previous tab', true)
+imap('<C-Left>', '<Esc>:tabprevious<CR>i', 'Go to previous tab (insert)', true)
+nmap('<C-Right>', ':tabnext<CR>', 'Go to next tab', true)
+imap('<C-Right>', '<Esc>:tabnext<CR>i', 'Go to next tab (insert)', true)
+
+-- Tab movement with Ctrl+Home/End
+nmap('<C-Home>', ':tabmove -1<CR>', 'Move tab left', true)
+imap('<C-Home>', '<Esc>:tabmove -1<CR>i', 'Move tab left (insert)', true)
+nmap('<C-End>', ':tabmove +1<CR>', 'Move tab right', true)
+imap('<C-End>', '<Esc>:tabmove +1<CR>i', 'Move tab right (insert)', true)
+
 
 -- Custom :Tabclose command
 vim.api.nvim_create_user_command('Tabclose', function()
@@ -220,10 +296,17 @@ end, {})
 -----------------------------------------------------------
 -- Tmux Navigator
 -----------------------------------------------------------
-map({ 'n', 'i' }, '<C-g>', '<Esc>:TmuxNavigateLeft<CR>i', { desc = 'Tmux Left', silent = true })
-map({ 'n', 'i' }, '<C-h>', '<Esc>:TmuxNavigateUp<CR>i', { desc = 'Tmux Up', silent = true })
-map({ 'n', 'i' }, '<C-l>', '<Esc>:TmuxNavigateRight<CR>i', { desc = 'Tmux Right', silent = true })
-map({ 'n', 'i' }, '<C-c>', '<Esc>:TmuxNavigateDown<CR>i', { desc = 'Tmux Down', silent = true })
+imap('<C-g>', '<Esc>:TmuxNavigateLeft<CR>i', 'Tmux Left', true)
+nmap('<C-g>', ':TmuxNavigateLeft<CR>', 'Tmux Left', true)
+
+imap('<C-l>', '<Esc>:TmuxNavigateRight<CR>i', 'Tmux Right', true)
+nmap('<C-l>', ':TmuxNavigateRight<CR>', 'Tmux Right', true)
+
+imap('<C-h>', '<Esc>:TmuxNavigateUp<CR>i', 'Tmux Up', true)
+nmap('<C-h>', ':TmuxNavigateUp<CR>', 'Tmux Up', true)
+
+imap('<C-c>', '<Esc>:TmuxNavigateDown<CR>i', 'Tmux Down', true)
+nmap('<C-c>', ':TmuxNavigateDown<CR>', 'Tmux Down', true)
 
 -----------------------------------------------------------
 -- Notes / Obsidian
@@ -235,5 +318,5 @@ nmap('<leader>ns', ':Obsidian search<CR>', 'Search notes', true)
 -----------------------------------------------------------
 -- Misc
 -----------------------------------------------------------
-nmap('<C-a>', 'ggVG', 'Select all text in buffer', true)
+nmap('<leader>sa', 'ggVG', 'Select all text in buffer', true)
 nmap('yf', ':let @+=expand("%:p")<CR>:echo "File path copied!"<CR>', 'Copy file path to clipboard', true)
