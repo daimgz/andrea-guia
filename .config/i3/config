@@ -2,18 +2,59 @@
 set $mod Mod4
 set $mod2 Mod1
 
+# ventana enfocada
+#client.focused          #border   #background   #text   #indicator   #child_border
+#client.unfocused        #border   #background   #text   #indicator   #child_border
+#client.focused_inactive #border   #background   #text   #indicator   #child_border
+#client.urgent           #border   #background   #text   #indicator   #child_border
+
+
+# Definición de colores (Variables)
+set $bg-dark      #1A0B2E
+set $purple-bright #000000
+set $magenta-neon  #FF00E5
+set $lavender-text #E0AAFF
+set $inactive-bg   #3C096C
+set $urgent-red    #FF5400
+
+
+# Colores exclusivos para las ventanas (Interface)
+set $ventana-activa-borde  #BD93F9
+set $ventana-activa-bg     #3C096C
+set $ventana-activa-texto  #ffffff
+
+set $ventana-inactiva-bg    #120521
+set $ventana-inactiva-texto #6272A4
+
+set $indicador-split       #FF79C6
+# Clase                 Borde                  Fondo                  Texto                  Indicador          Borde_Hijo
+# ---------------------------------------------------------------------------------------------------------------------------
+# La ventana que usás: Borde lila claro, fondo oscuro sólido y texto casi blanco.
+client.focused          $ventana-activa-borde  $ventana-activa-bg     $ventana-activa-texto  $indicador-split   $ventana-activa-borde
+
+# Ventanas en segundo plano: El texto se "apaga" y el borde se funde con el wallpaper.
+client.unfocused        $ventana-inactiva-bg   $ventana-inactiva-bg   $ventana-inactiva-texto $ventana-inactiva-bg $ventana-inactiva-bg
+
+# Ventana enfocada pero en otro monitor (si tenés varios) o inactiva en el stack.
+client.focused_inactive $ventana-inactiva-bg   $ventana-inactiva-bg   $ventana-inactiva-texto $ventana-inactiva-bg $ventana-inactiva-bg
+
+# Urgente: Rojo vibrante para que destaque sí o sí.
+client.urgent           #FF5555                #FF5555                #FFFFFF                #FF5555            #FF5555
+#client.focused          #5219be  #5219be  #ffffff  #ffffff  #5219be
+
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
 exec --no-startup-id dex --autostart --environment i3
 exec --no-startup-id xbindkeys
 exec --no-startup-id picom
+exec --no-startup-id dunst
 
 # border config
 default_border pixel 4
 smart_borders on
 
 #gasp
-gaps inner 11
+gaps inner 18
 smart_gaps off
 
 
@@ -24,7 +65,7 @@ exec --no-startup-id xss-lock --transfer-sleep-lock -- i3lock --nofork
 # and nm-applet is a desktop environment-independent system tray GUI for it.
 exec --no-startup-id nm-applet
 
-exec --no-startup-id feh --bg-scale ~/Pictures/wallpaper/space.jpg --bg-scale ~/Pictures/wallpaper/space.png
+exec --no-startup-id feh --bg-scale ~/Pictures/wallpaper/purpleSky.jpg --bg-scale ~/Pictures/wallpaper/purpleSky.jpg
 
 # Use pactl to adjust volume in PulseAudio.
 set $refresh_i3status killall -SIGUSR1 i3status
@@ -56,8 +97,8 @@ bindsym $mod+Return exec alacritty
 # kill focused window
 bindsym $mod+period kill
 
-# start rufi (a program launcher)
-bindsym $mod+p exec --no-startup-id rofi -combi-modi drun -theme ~/myLinuxConfig/rofi/rounded-blue-dark -font "hack 13" -show combi -display-combi "Ejecutar:" disable-history true -sorting-method "normal" -sort true -display-drun "" -config -icon-theme "Papirus" -show-icons -combi-display-format "{text} {mode}" -no-levenshtein-sort
+# start (a program launcher)
+bindsym $mod+p exec --no-startup-id jgmenu_run
 
 bindsym $mod+Shift+p exec --no-startup-id ~/Scripts/$(ls ~/Scripts/ | dmenu)
 
@@ -82,22 +123,17 @@ bindsym --release $mod+Shift+t exec --no-startup-id ~/Scripts/sscreenshot.sh
 # Open scripts
 bindsym $mod+j exec ~/Scripts/checklist.sh
 
-# Use the mouse
-#bindsym $mod+Up exec xdotool mousemove_relative -- 0 -20
-#bindsym $mod+Down exec xdotool mousemove_relative -- 0 +20
-#bindsym $mod+Right exec xdotool mousemove_relative -- +20 0
-#bindsym $mod+Left exec xdotool mousemove_relative -- -20 0
-
-bindsym $mod+Home exec xdotool click 1
-bindsym $mod+Next exec xdotool click 4
-bindsym $mod+Prior exec xdotool click 5
-bindsym $mod+End exec xdotool click 3
+# Dunst notification controls
+#bindsym $mod+n exec ~/.local/bin/dunst-history-rofi.sh
+#bindsym $mod+Shift+n exec dunstctl close
+#bindsym $mod+Ctrl+n exec dunstctl close-all
+#bindsym $mod+Shift+p exec dunstctl set-paused toggle
 
 # change focus
-bindsym $mod+r focus left
-bindsym $mod+t focus down
-bindsym $mod+n focus up
-bindsym $mod+s focus right
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
 
 bindsym $mod+Tab focus down
 bindsym $mod+Shift+Tab focus up
@@ -106,10 +142,10 @@ bindsym $mod+Shift+Tab focus up
 #bindsym $mod+Shift+space hide
 
 # change position
-bindsym $mod+g move left
-bindsym $mod+c move down
-bindsym $mod+h move up
-bindsym $mod+l move right
+bindsym $mod+Home move left
+bindsym $mod+Next move down
+bindsym $mod+Prior move up
+bindsym $mod+End move right
 
 # toggle sticky windows
 bindsym $mod+comma sticky toggle
@@ -164,6 +200,8 @@ bindsym $mod+5  workspace 5
 bindsym $mod+i  workspace 5
 
 bindsym $mod+6  workspace 6
+bindsym $mod+d  workspace 6
+
 bindsym $mod+7  workspace 7
 bindsym $mod+8  workspace 8
 bindsym $mod+9  workspace 9
@@ -213,8 +251,8 @@ bindsym $mod+Shift+F8 move container to workspace F8
 bindsym $mod+Shift+F9 move container to workspace F9
 bindsym $mod+Shift+F0 move container to workspace F0
 
-bindsym $mod+Right workspace next
-bindsym $mod+Left  workspace prev
+#bindsym $mod+Right workspace next
+#bindsym $mod+Left  workspace prev
 
 #toggle the window stacking
 bindsym $mod+y layout toggle stacking split
@@ -222,28 +260,53 @@ bindsym $mod+y layout toggle stacking split
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 
-bar {
-    id bar-1
-    status_command py3status --config ~/.config/i3status/config1
-	position top
-	tray_output none
-	font pango:DejaVu Sans Mono 16
-	separator_symbol |
-	mode hide
-	hidden_state hide
-	modifier none
-}
+#exec --no-startup-id dex --autostart --environment i3
+#exec --no-startup-id ~/.config/i3status/bar.sh
+exec_always ~/.config/i3status/photonbar --restart
 
-bar {
-    id bar-2
-    status_command py3status --config ~/.config/i3status/config2
-	position bottom
-	tray_output primary
-	font pango:DejaVu Sans Mono 16
-	separator_symbol |
-	mode hide
-	hidden_state hide
-    modifier none
-    workspace_buttons no
-}
+#bar {
+    #id bar-1
+    #status_command py3status --config ~/.config/i3status/config1
+	#position top
+	#tray_output none
+	#font pango:DejaVu Sans Mono 16
+	#separator_symbol " ▏"
+	#mode hide
+	#hidden_state hide
+	#modifier none
+  #colors {
+    #background $bg-dark
+    #statusline $lavender-text
+    #separator  $lavender-text
+
+    ##                  Borde           Fondo           Texto
+    #focused_workspace  $purple-bright  #5219be  $lavender-text
+    #active_workspace   $inactive-bg    $inactive-bg    $lavender-text
+    #inactive_workspace $bg-dark        $bg-dark        #7B2CBF
+    #urgent_workspace   $urgent-red     $urgent-red     #ffffff
+  #}
+#}
+
+#bar {
+    #id bar-2
+    #status_command py3status --config ~/.config/i3status/config2
+	#position bottom
+	#tray_output primary
+	#font pango:DejaVu Sans Mono 16
+	#separator_symbol " ▏"
+	#mode hide
+	#hidden_state hide
+  #modifier none
+  #workspace_buttons no
+  #colors {
+    #background #090017
+    #statusline $lavender-text
+    #separator  $lavender-text
+    ##                  Borde           Fondo           Texto
+    #focused_workspace  $purple-bright  $purple-bright  $lavender-text
+    #active_workspace   $inactive-bg    $inactive-bg    $lavender-text
+    #inactive_workspace $bg-dark        $bg-dark        #7B2CBF
+    #urgent_workspace   $urgent-red     $urgent-red     #ffffff
+  #}
+#}
 

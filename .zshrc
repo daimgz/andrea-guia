@@ -20,6 +20,8 @@ export GOPATH="$HOME/go"
 export PATH="$PATH:$HOME/Scripts:$GOPATH/bin"
 
 export PATH="/usr/lib/ccache/bin:$PATH"
+
+eval "$(zoxide init bash)"
 # Personal Zsh configuration file. It is strongly recommended to keep all
 # shell customization and configuration (including exported environment
 # variables such as PATH) in this file or in files sourced from it.
@@ -82,6 +84,9 @@ path=(~/bin $path)
 
 # Export environment variables.
 export GPG_TTY=$TTY
+
+# Cargar zsh-vi-mode
+#source ~/.zsh-vi-mode/zsh-vi-mode.plugin.zsh
 
 # Source additional local files if they exist.
 z4h source ~/.env.zsh

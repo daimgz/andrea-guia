@@ -28,3 +28,8 @@ api.nvim_set_hl(0, 'VertSplit', { fg = '#2e2e2e' })
 api.nvim_set_hl(0, 'IblScope', { fg = '#74547d', bg = 'NONE' })
 
 api.nvim_set_hl(0, "SnacksIndent", { fg = "#504945" })
+
+-- Colores basados en tu paleta
+vim.cmd("highlight TabLine guifg=#e0aaff guibg=#1A0B2E")
+vim.cmd("highlight TabLineSel guifg=#1A0B2E guibg=#9530D9 gui=bold")
+vim.cmd("highlight TabLineFill guibg=#0D0226")

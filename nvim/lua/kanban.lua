@@ -4,6 +4,8 @@
 -- ==================== CONFIGURATION ====================
 
 local M = {}
+-- TODO: hacer que cuando se guarde un archivo se guarden todos
+-- TODO: Poner opcion en config para que se guarde solo el archivo de kanban al cerrar
 
 -- Preview configuration
 local preview_config = {
@@ -115,7 +117,7 @@ local function update_preview(filename)
   local left_fill = string.rep("─", title_pos)
   local right_fill = string.rep("─", width - title_pos - #title_with_padding)
   local title_line = left_fill .. title_with_padding .. right_fill
-  
+
   local content = {title_line, ""}
   for _, line in ipairs(lines) do
     table.insert(content, line)
@@ -130,7 +132,7 @@ local function update_preview(filename)
   if ft then
     vim.api.nvim_buf_set_option(buf, "filetype", ft)
   end
-  
+
   -- Add highlighting for title line
   vim.api.nvim_buf_add_highlight(buf, -1, "Title", 0, 0, -1)
 
@@ -142,7 +144,10 @@ local function update_preview(filename)
     row = row,
     col = col,
     border = "none",
-    style = "minimal"
+    style = "minimal",
+    focusable = false,  -- Preview should not be focusable
+    zindex = 1,  -- Send to bottom to allow all popups to appear on top
+    winhighlight = "Normal:Normal"
   })
 
   -- Enable wrap for long lines
@@ -248,12 +253,16 @@ local function ke_open_file()
     style = "minimal",
     title = filename,
     title_pos = "center",
-    zindex = 50  -- Lower z-index for floating windows to appear above
+    focusable = true,  -- Allow editing in this window
+    zindex = 1,  -- Send to bottom to allow completion popups (50+) to appear on top
+    winhighlight = "Normal:Normal,FloatBorder:FloatBorder"
   })
-  
+
   -- Enable line numbers
   vim.api.nvim_win_set_option(win, "number", true)
   vim.api.nvim_win_set_option(win, "relativenumber", false)
+  
+
 end
 
 -- Open or create file with header
@@ -380,12 +389,12 @@ local function create_new_file()
     -- Get visual selection boundaries
     local start_pos = vim.fn.getpos("'<")
     local end_pos = vim.fn.getpos("'>")
-    
+
     start_line = start_pos[2]
     end_line = end_pos[2]
     start_col = start_pos[3]
     end_col = end_pos[3]
-    
+
     if start_line == end_line then
     -- Single line selection
       -- Get exact visual selection using yank
@@ -401,7 +410,7 @@ local function create_new_file()
       print("Error: Solo se permite seleccionar texto de una sola línea")
       return
     end
-    
+
     filename = original_text
   else
     -- Normal mode - ask for filename
@@ -449,7 +458,7 @@ local function create_new_file()
     local start_line = start_pos[2] - 1  -- 0-indexed for API
     local start_col = start_pos[3] - 1  -- 0-indexed for API
     local end_col = end_pos[3]          -- end_pos is already inclusive
-    
+
     local lines = vim.api.nvim_buf_get_lines(0, start_line, start_line + 1, false)
     if lines and lines[1] then
       local line = lines[1]

@@ -1,0 +1,46 @@
+# Tema adaptado a 1 columna y estilo purple girl
+
+tint2_look           = 0
+columns              = 1
+
+menu_width           = 650
+menu_height_min      = 470
+menu_height_max      = 600
+
+menu_padding_top     = 50
+menu_padding_right   = 15
+menu_padding_bottom  = 0
+menu_padding_left    = 15
+
+menu_radius          = 25
+menu_border          = 2
+menu_halign          = center
+menu_valign          = center
+
+item_margin_y        = 5
+item_height          = 60
+item_padding_x       = 12
+item_radius          = 14
+item_border          = 0
+
+sep_height           = 0
+
+font                 = Montserrat 16
+icon_size            = 24
+icon_text_spacing    = 8
+
+# Purple girl palette (misma que el menú compacto)
+color_menu_bg        = #1A0B2E 60
+color_menu_border    = #3C096C 100
+
+color_norm_bg        = #190a2b 75
+color_norm_fg        = #E6D9FF 100
+
+color_sel_bg         = #5A189A 95
+color_sel_fg         = #FFFFFF 100
+color_sel_border     = #BD93F9 100
+
+color_sep_fg         = #6272A4 70
+
+csv_no_dirs          = 1
+csv_name_format      = %n\n<span size="x-small" foreground="#AFAAFB">%g</span>

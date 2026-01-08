@@ -75,3 +75,14 @@ vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter" }, {
   command = "checktime",
 })
 
+-- guardar la vista antes de escribir
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*",
+  command = "mkview"
+})
+
+-- restaurar la vista después de escribir
+vim.api.nvim_create_autocmd("BufWritePost", {
+  pattern = "*",
+  command = "loadview"
+})

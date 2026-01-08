@@ -1,6 +1,5 @@
 order += "resources_monitor"
 order += "space root"
-order += "space home"
 order += "ping"
 
 space root {
@@ -9,8 +8,3 @@ space root {
     partition = "/"
 }
 
-space home {
-    display = 1
-    name = "🏠"
-    partition = "/home/dai/"
-}

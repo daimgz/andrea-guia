@@ -1,92 +1,162 @@
 #!/bin/bash
 
-# Configuration
-BASE_DIR="$HOME/Documents/Notes/checklists"
-DMENU_OPTS=(-i -l 1000)  # Options as array
+# -------------------------------
+# Configuración
+# -------------------------------
+DMENU_OPTS=(-i -l 1000)  # insensible a mayúsculas, hasta 1000 líneas
 THEME=(-fn "Fira Code-17" -nb "#1d2021" -nf "#ebdbb2" -sb "#176786" -sf "#ebdbb2")
 
-init_base_dir() {
-    [[ ! -d "$BASE_DIR" ]] && mkdir -p "$BASE_DIR"
-}
-
+# -------------------------------
+# Función para mostrar proyectos
+# -------------------------------
 show_main_menu() {
-    ls "$BASE_DIR" | dmenu "${DMENU_OPTS[@]}" "${THEME[@]}"
+    task _projects | dmenu "${DMENU_OPTS[@]}" "${THEME[@]}"
 }
 
+# -------------------------------
+# Función para mostrar tareas de un proyecto
+# -------------------------------
 show_items_menu() {
-    local file="$1"
-    cat "$BASE_DIR/$file" | dmenu "${DMENU_OPTS[@]}" "${THEME[@]}"
+    local project="$1"
+    # Obtener solo descripciones de tareas pendientes
+    task project:"$project" +PENDING export 2>/dev/null | jq -r '.[].description' | dmenu "${DMENU_OPTS[@]}" "${THEME[@]}"
 }
 
+# -------------------------------
+# Procesar tarea: toggle/add
+# -------------------------------
 process_item() {
-    local file="$1"
-    local item="$2"
-    
-    # Check if the item already exists in the list (exact match)
-    if grep -qFx "$item" "$BASE_DIR/$file"; then
-        # If item exists, remove it using sed (escaping slashes in item)
-        sed -i "/^${item//\//\\/}$/d" "$BASE_DIR/$file"
-        echo "Item removed: $item"
+    local project="$1"
+    local selection="$2"
+
+    [[ -z "$selection" ]] && return
+
+    # Buscar tarea exacta en JSON
+    task_id=$(task project:"$project" +PENDING export | \
+        jq -r --arg desc "$selection" '.[] | select(.description==$desc) | .id')
+
+    if [[ -n "$task_id" ]]; then
+        task "$task_id" done
+        echo "Marked done: $selection"
     else
-        # If item does not end with a dot, add one for consistency
-        [[ "${item: -1}" != "." ]] && item="$item."
-        # Add the new item to the list
-        echo "$item" >> "$BASE_DIR/$file"
-        echo "Item added: $item"
+        task add project:"$project" "$selection"
+        echo "Added new task: $selection"
     fi
 }
 
-create_list() {
-    local file="$1"
-    # If filename does not end with .txt, append it
-    [[ "$file" != *".txt" ]] && file="$file.txt"
-    touch "$BASE_DIR/$file"
-    echo "List created: $file"
+# -------------------------------
+# Crear proyecto si no existe
+# -------------------------------
+create_project_if_missing() {
+    local project="$1"
+    if ! task _projects | grep -qx "$project"; then
+        # Crear placeholder temporal
+        task add project:"$project" "__placeholder__"
+        id=$(task project:"$project" +PENDING limit:1 _ids)
+        # Borrar automáticamente sin confirmación
+        task rc.confirmation=no "$id" delete
+        echo "Project created: $project"
+    fi
 }
 
+# -------------------------------
+# Eliminar proyecto completo
+# -------------------------------
+delete_project() {
+    local project="$1"
+
+    # Borrar todas las tareas pendientes sin confirmación
+    for id in $(task project:"$project" +PENDING _ids); do
+        task rc.confirmation=no "$id" delete
+    done
+
+    # Borrar todas las tareas completadas también
+    for id in $(task project:"$project" +COMPLETED _ids); do
+        task rc.confirmation=no "$id" delete
+    done
+
+    echo "Deleted project: $project"
+}
+
+# -------------------------------
+# Renombrar proyecto
+# -------------------------------
+rename_project() {
+    local old="$1"
+    local new="$2"
+
+    # Crear proyecto nuevo si no existe
+    create_project_if_missing "$new"
+
+    # Mover todas las tareas pendientes
+    for id in $(task project:"$old" +PENDING _ids); do
+        task $id modify project:"$new"
+    done
+
+    # Mover tareas completadas también (opcional)
+    for id in $(task project:"$old" +COMPLETED _ids); do
+        task $id modify project:"$new"
+    done
+
+    echo "Renamed project: $old → $new"
+}
+
+# -------------------------------
+# Renombrar tarea
+# -------------------------------
+rename_task() {
+    local project="$1"
+    local old_desc="$2"
+    local new_desc="$3"
+
+    id=$(task project:"$project" +PENDING export | \
+        jq -r --arg desc "$old_desc" '.[] | select(.description==$desc) | .id')
+
+    if [[ -n "$id" ]]; then
+        task "$id" modify description:"$new_desc"
+        echo "Renamed task: $old_desc → $new_desc"
+    fi
+}
+
+# -------------------------------
+# Función principal
+# -------------------------------
 main() {
-    init_base_dir
-    
     while true; do
-        file=$(show_main_menu)
-        [[ -z "$file" ]] && break
-        
-        # Special operations
-        if [[ "$file" == *" --remove" ]]; then
-            # If the selected option ends with " --remove", delete the file
-            local file="${file% --remove}"
-            rm "$BASE_DIR/$file"
+        # Menú de proyectos
+        project=$(show_main_menu)
+        [[ -z "$project" ]] && break
 
-            echo "List deleted: $file"
-            
+        # Detectar comandos especiales tipo --remove, --rename
+        if [[ "$project" == *" --remove" ]]; then
+            local proj="${project% --remove}"
+            delete_project "$proj"
             continue
-
-        elif [[ "$file" == *" --rename "* ]]; then
-            # If the selected option matches the rename pattern, extract old and new names
-            local old_name="${file%% --rename *}"
-            local new_name="${file#* --rename }"
-
-            mv "$BASE_DIR/$old_name" "$BASE_DIR/$new_name.txt"
-
-            echo "List renamed: $old_name → $new_name.txt"
-
+        elif [[ "$project" == *" --rename "* ]]; then
+            local old="${project%% --rename *}"
+            local new="${project#* --rename }"
+            rename_project "$old" "$new"
             continue
+        fi
 
-        fi
-        
-        # Check if list exists
-        if [[ -f "$BASE_DIR/$file" ]]; then
-            echo "List opened: $file"
-            
-            while true; do
-                item=$(show_items_menu "$file")
-                [[ -z "$item" ]] && break
-                process_item "$file" "$item"
-            done
-            
-        else
-            create_list "$file"
-        fi
+        # Crear proyecto si no existía
+        create_project_if_missing "$project"
+
+        # Menú de tareas
+        while true; do
+            selection=$(show_items_menu "$project")
+            [[ -z "$selection" ]] && break
+
+            # Detectar renombrado de tarea: "viejo --rename nuevo"
+            if [[ "$selection" == *" --rename "* ]]; then
+                old="${selection%% --rename *}"
+                new="${selection#* --rename }"
+                rename_task "$project" "$old" "$new"
+                continue
+            fi
+
+            process_item "$project" "$selection"
+        done
     done
 }
 

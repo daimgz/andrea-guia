@@ -1,3 +1,4 @@
+order += "stopwatch"
 order += "audio"
 order += "battery pc"
 order += "mytime"
@@ -10,6 +11,12 @@ audio {
         "
 }
 
+stopwatch {
+    interval = 1
+    running_color = "#a3be8c"
+    stopped_color = "#88c0d0"
+    icon = "⏱"
+}
 battery pc{
 	last_full_capacity = true
         format = "%status %percentage %remaining"

@@ -25,6 +25,6 @@ class Py3status:
             return memory.percent
 
         return {
-            'full_text': f"RAM: {get_ram()}% | CPU: {get_cpu_usage()}% {get_cpu_temperature()}",
+            'full_text': f"RAM: {get_ram()}% ▏CPU: {get_cpu_usage()}% {get_cpu_temperature()}",
             'cached_until': self.py3.time_in(1),
         }

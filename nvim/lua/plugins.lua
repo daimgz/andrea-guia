@@ -7,6 +7,12 @@ return {
 
   -- Syntax / colors / treesitter
   {
+    "folke/tokyonight.nvim",
+    lazy = false,
+    priority = 1000,
+    opts = {},
+  },
+  {
     'norcalli/nvim-colorizer.lua',
     config = function() require('colorizer').setup() end
   },
@@ -88,9 +94,37 @@ return {
     'nvim-lualine/lualine.nvim',
     dependencies = { 'nvim-tree/nvim-web-devicons' },
     config = function()
+      local purple_sunset = {
+  normal = {
+    a = { fg = "#e0aaff", bg = "#1A0B2E", gui = "bold" },
+    b = { fg = "#ffffff", bg = "#522eb8" },
+    c = { fg = "#e0aaff", bg = "#1A0B2E" },
+
+  },
+  insert = {
+    a = { fg = "#e0aaff", bg = "#6D238C", gui = "bold" },
+    b = { fg = "#ffffff", bg = "#522eb8" },
+    c = { fg = "#e0aaff", bg = "#1A0B2E" },
+  },
+  visual = {
+    a = { fg = "#e0aaff", bg = "#9530D9", gui = "bold" },
+    b = { fg = "#ffffff", bg = "#522eb8" },
+    c = { fg = "#e0aaff", bg = "#1A0B2E" },
+  },
+  replace = {
+    a = { fg = "#1A0B2E", bg = "#E0245E", gui = "bold" },
+    b = { fg = "#e0aaff", bg = "#522eb8" },
+    c = { fg = "#e0aaff", bg = "#0D0226" },
+  },
+  inactive = {
+    a = { fg = "#e0aaff", bg = "#0D0226", gui = "bold" },
+    b = { fg = "#e0aaff", bg = "#0D0226" },
+    c = { fg = "#e0aaff", bg = "#0D0226" },
+  },
+}
       require('lualine').setup({
         options = {
-          theme = 'gruvbox',
+          theme = purple_sunset,
           globalstatus = true,
           component_separators = { left = '', right = '' },
           section_separators = { left = '', right = '' },
@@ -137,6 +171,9 @@ return {
       },
       input = { enabled = false },
       picker = {
+        layout = {
+          preset = "ivy_split",
+        },
         enabled = true,
         matcher = {
           sort_empty = true
@@ -201,7 +238,16 @@ return {
 
   -- IDE / UI
   { 'editorconfig/editorconfig-vim' },
-  { 'mg979/vim-visual-multi' },
+  {
+    "mg979/vim-visual-multi",
+    init = function()
+      --vim.g.VM_default_mappings = 1
+      vim.g.VM_maps = {
+        ["Select Cursor Right"] = "<M-Right>",
+        ["Select Cursor Left"]  = "<M-Left>",
+      }
+    end,
+  },
   --{ 'mhinz/vim-signify' },
   --{ 'lukas-reineke/indent-blankline.nvim',
     --main = "ibl",
@@ -548,7 +594,65 @@ return {
       }
     end,
   },
-  { "Olivine-Labs/lustache" }
+  { "Olivine-Labs/lustache" },
+  { 'junegunn/vim-easy-align'},
+  {
+    'MagicDuck/grug-far.nvim',
+    -- Note (lazy loading): grug-far.lua defers all it's requires so it's lazy by default
+    -- additional lazy config to defer loading is not really needed...
+    config = function()
+      -- optional setup call to override plugin options
+      -- alternatively you can set options with vim.g.grug_far = { ... }
+      require('grug-far').setup({
+        -- options, see Configuration section below
+        -- there are no required options atm
+      });
+    end
+  },
+  { "chrisgrieser/nvim-rip-substitute",
+    config = function()
+      require("rip-substitute").setup({
+        keymaps = {
+          abort = "<Esc>",
+          confirm = "<CR>",
+          insertModeConfirm = "<C-CR>",
+          prevSubstitutionInHistory = "<Up>",
+          nextSubstitutionInHistory = "<Down>",
+          toggleFixedStrings = "<C-f>",
+          toggleIgnoreCase = "<C-c>",
+          openAtRegex101 = "R",
+          showHelp = "?",
+        }
+      })
+    end
+  },
+  {
+    "kndndrj/nvim-dbee",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+    },
+    build = function()
+      -- Install tries to automatically detect the install method.
+      -- if it fails, try calling it with one of these parameters:
+      --    "curl", "wget", "bitsadmin", "go"
+      require("dbee").install()
+    end,
+    config = function()
+    require("dbee").setup {
+      sources = {
+        require("dbee.sources").MemorySource:new({
+          {
+            name = "superAdmin",
+            type = "sqlite",
+            url = "/home/dai/.local/share/SuperAdmin/Super Admin System/superAdmin.db",
+          },
+        }),
+      },
+    }
+    end,
+  },
+  { 'tpope/vim-eunuch' },
+
 --{
   --"folke/which-key.nvim",
   --config = function()

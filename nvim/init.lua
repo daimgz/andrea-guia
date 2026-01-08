@@ -1,6 +1,9 @@
 -- Neovim init.lua that simply sources your existing ~/.vimrc
 -- This allows you to keep using your Vim configuration in Neovim.
 
+vim.g.mapleader = ' '
+vim.g.maplocalleader = " "
+
 -- 1) Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath('data') .. '/lazy/lazy.nvim'
 if not vim.loop.fs_stat(lazypath) then

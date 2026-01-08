@@ -4,7 +4,7 @@ alias md='mkdir'
 alias f='ranger'
 alias s-f='sudo ranger'
 alias speedtest='~/portable/speedtest'
-
+alias ical='ikhal; vdirsyncer sync fruux; echo "Sync done"'
 
 #ls
 alias ll='ls -alF'
@@ -90,7 +90,7 @@ alias melokeys='v ~/myLinuxConfig/melokey/keymap.c'
 #others
 alias vdw="xdotool key --repeat $1 122"
 alias vup="xdotool key --repeat $1 123"
- 
+
 #work
 alias py="python"
 alias venv="source venv/bin/activate"

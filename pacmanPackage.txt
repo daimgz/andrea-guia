@@ -55,7 +55,7 @@ pacman4console yay pamac-gtk3 snapd snapd-glib podman docker docker-buildx docke
 xorg-server xorg-xinit xorg-xinput xorg-xkill xorg-xev xorg-mkfontscale
 lightdm lightdm-gtk-greeter lightdm-gtk-greeter-settings
 i3-wm i3status i3blocks i3lock py3status
-rofi dmenu picom nitrogen feh
+rofi dmenu picom nitrogen feh jgmenu
 lxappearance lxappearance-obconf matcha-gtk-theme terminus-font
 xclip xbindkeys transset-df
 

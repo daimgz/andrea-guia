@@ -2,8 +2,6 @@
 local map = vim.keymap.set
 local silentArg = { silent = true }
 
-vim.g.mapleader = ' '
-
 -- nmap
 local function nmap(lhs, rhs, desc, silent)
   silent = silent == nil and false or silent  -- default true
@@ -63,6 +61,8 @@ imap('<Home>', '<Home>', 'Home key (terminal)', true)
 --imap('<ESC>[8~', '<End>', 'End key (terminal)', true)
 --imap('<ESC>[7~', '<Home>', 'Home key (terminal)', true)
 
+nmap('<C-,>', ':Rename ', 'Rename file', false)
+
 -----------------------------------------------------------
 -- Save / Reload
 -----------------------------------------------------------
@@ -87,6 +87,16 @@ vmap('<leader>ca', '<Plug>(coc-codeaction-selected)', 'Code Action on selection'
 nmap('<leader>cf', '<Plug>(coc-format)', 'Format buffer', true)
 nmap('<leader>ch', ':call CocActionAsync("doHover")<CR>', 'Show symbol docs', true)
 
+
+-- Completion helpers (Coc)
+vim.keymap.set('i', '<End>', function()
+  return vim.fn['coc#pum#visible']() == 1 and vim.fn['coc#pum#confirm']() or '<End>'
+end, { expr = true, silent = true, desc = 'Confirm completion or move End' })
+
+vim.keymap.set('i', '<Home>', function()
+  return vim.fn['coc#pum#visible']() == 1 and vim.fn['coc#pum#cancel']() or '<Home>'
+end, { expr = true, silent = true, desc = 'Cancel completion or move Home' })
+
 -----------------------------------------------------------
 -- C++ Code Generation
 -----------------------------------------------------------
@@ -101,8 +111,11 @@ map({ 'n', 'v' }, '<leader>cc', '<Plug>NERDCommenterToggle', { desc = 'Toggle co
 -----------------------------------------------------------
 -- 🔍 Find / Replace
 -----------------------------------------------------------
-nmap('<leader>fR', ':%s///gc<Left><Left><Left><Left>', 'Find & Replace (global)', false)
-vmap('<leader>fR', '"ay:%s/<C-R>a//gc<Left><Left><Left>', 'Find & Replace (visual)', false)
+--nmap('<leader>fR', ':%s///gc<Left><Left><Left><Left>', 'Find & Replace (global)', false)
+--vmap('<leader>fR', '"ay:%s/<C-R>a//gc<Left><Left><Left>', 'Find & Replace (visual)', false)
+nmap('<leader>rg', ':GrugFar<CR>', 'Find & Replace (grug-far)', true)
+nmap('<leader>rl', ':RipSubstitute<CR>', 'Rip Substitute', true)
+-- TODO: hacer que el ripsubtitute funcine con visual mode.
 xmap('p', 'pgvy', 'Paste without losing register', true)
 vmap('/', '"ay/<C-R>a', 'Search selection', false)
 nmap('n', 'nzz', 'Next search (centered)', true)
@@ -191,7 +204,9 @@ nmap('<leader>gB', ':GitBlame<CR>', 'Git blame', true)
 nmap('<leader>gc', ':!git commit -m ""<Left>', 'Git commit', false)
 nmap('<leader>gp', ':!git pull<CR>', 'Git pull', true)
 nmap('<leader>gP', ':!git push<CR>', 'Git push', true)
+nmap('<leader>gC', ':!git checkout ', 'Git checkout', false)
 nmap('<leader>gb', function() Snacks.picker.git_branches() end, 'Git branches', true)
+nmap('<leader>gl', function() Snacks.picker.git_log() end, 'Git log', true)
 nmap('<leader>gd', ':DiffviewOpen<CR>', 'Git diff open', true)
 nmap('<leader>gD', ':DiffviewClose<CR>', 'Git diff close', true)
 local function next_hunk_centered()
@@ -258,10 +273,10 @@ nmap('<C-End>', ':tabmove +1<CR>', 'Move tab right', true)
 imap('<C-End>', '<Esc>:tabmove +1<CR>i', 'Move tab right (insert)', true)
 
 -- Tab navigation with Ctrl+Left/Right
-nmap('<C-Left>', ':tabprevious<CR>', 'Go to previous tab', true)
-imap('<C-Left>', '<Esc>:tabprevious<CR>i', 'Go to previous tab (insert)', true)
-nmap('<C-Right>', ':tabnext<CR>', 'Go to next tab', true)
-imap('<C-Right>', '<Esc>:tabnext<CR>i', 'Go to next tab (insert)', true)
+--nmap('<C-Left>', ':tabprevious<CR>', 'Go to previous tab', true)
+--imap('<C-Left>', '<Esc>:tabprevious<CR>i', 'Go to previous tab (insert)', true)
+--nmap('<C-Right>', ':tabnext<CR>', 'Go to next tab', true)
+--imap('<C-Right>', '<Esc>:tabnext<CR>i', 'Go to next tab (insert)', true)
 
 -- Tab movement with Ctrl+Home/End
 nmap('<C-Home>', ':tabmove -1<CR>', 'Move tab left', true)
@@ -320,3 +335,14 @@ nmap('<leader>ns', ':Obsidian search<CR>', 'Search notes', true)
 -----------------------------------------------------------
 nmap('<leader>sa', 'ggVG', 'Select all text in buffer', true)
 nmap('yf', ':let @+=expand("%:p")<CR>:echo "File path copied!"<CR>', 'Copy file path to clipboard', true)
+--add xmap ga <Plug>(EasyAlign)
+
+nmap('ga', '<Plug>(EasyAlign)', 'Easy Align', true)
+vmap('ga', '<Plug>(EasyAlign)', 'Easy Align', true)
+
+nmap('tt', ':ChecklistToggleCheckbox<CR>', 'Toggle Checkbox', true)
+vmap('tt', ':ChecklistToggleCheckbox<CR>', 'Toggle Checkbox', true)
+
+-- Mapeo a una sola tecla, por ejemplo <Tab>
+nmap('<Tab>', 'za', 'Toggle fold', true)
+nmap('<leader><Tab>', 'zO', 'Toggle fold', true)
