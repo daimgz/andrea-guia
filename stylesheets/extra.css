@@ -1,0 +1,9 @@
+/* Reduce espacio entre líneas en bloques de código */
+pre code {
+  line-height: 1.1;
+}
+
+/* Opcional: hacerlo todavía más compacto */
+.md-typeset pre code {
+  line-height: 1.2;
+}
